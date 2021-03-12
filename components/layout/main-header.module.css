@@ -24,6 +24,10 @@
 	color: white;
 }
 
+.navigation ul {
+	list-style-type: none;
+}
+
 .navigation a {
 	text-decoration: none;
 	color: white;
