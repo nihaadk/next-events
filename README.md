@@ -1,5 +1,5 @@
 ## Next Events 
 
-Web Application create with NextJs and ReactJs
+Web Application for handling Events create with NextJs and React
 
 [DEMO](https://next-events-sand.vercel.app/)
