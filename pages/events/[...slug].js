@@ -4,11 +4,24 @@ import ResultsTitle from '../../components/events/results-title';
 import { Fragment } from 'react';
 import Button from '../../components/ui/button';
 import ErrorAlert from '../../components/error-alert/error-alert';
+import Head from 'next/head';
 
 function FilteredEventsPage(props) {
+	const date = new Date(props.date.year, props.date.month - 1);
+	const year = date.getFullYear();
+	const month = date.getMonth() + 1;
+
+	const pageHeadData = (
+		<Head>
+			<title>Filterd Events</title>
+			<meta name="description" content={`All event for ${month}/${year}.`} />
+		</Head>
+	);
+
 	if (props.hasError) {
 		return (
 			<Fragment>
+				{pageHeadData}
 				<ErrorAlert>
 					<p>Invalid filter. Please adjust your values!</p>
 				</ErrorAlert>
@@ -24,6 +37,7 @@ function FilteredEventsPage(props) {
 	if (!filterEvents || filterEvents.length === 0) {
 		return (
 			<Fragment>
+				{pageHeadData}
 				<ErrorAlert>
 					<p>No events found for the chosen filter</p>
 				</ErrorAlert>
@@ -35,10 +49,9 @@ function FilteredEventsPage(props) {
 		);
 	}
 
-	const date = new Date(props.date.year, props.date.month - 1);
-
 	return (
 		<Fragment>
+			{pageHeadData}
 			<ResultsTitle date={date} />
 			<EventList items={filterEvents} />
 		</Fragment>
