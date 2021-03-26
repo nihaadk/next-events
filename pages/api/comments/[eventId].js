@@ -1,12 +1,8 @@
-import { MongoClient } from 'mongodb';
+import { connectionDatabase, insertDoucment, getAllDocuments } from '../../../helpers/db-util';
 
 async function hander(req, res) {
 	const eventId = req.query.eventId;
-
-	const client = await MongoClient.connect(
-		'mongodb+srv://nihadk:PASSWORD@cluster0.fwqsr.mongodb.net/events?retryWrites=true&w=majority'
-	);
-	const db = client.db();
+	let client;
 
 	if (req.method === 'POST') {
 		const { email, name, text } = req.body;
@@ -23,14 +19,36 @@ async function hander(req, res) {
 			eventId
 		};
 
-		const result = await db.collection('comments').insertOne(newComment);
-		newComment.id = result.insertedId;
-		res.status(201).json({ message: 'Added comment', comment: newComment });
+		try {
+			client = await connectionDatabase();
+		} catch (error) {
+			res.status(500).json({ message: 'Connect to the Dababase failed' });
+			return;
+		}
+
+		try {
+			const result = await insertDoucment(client, 'comments', newComment);
+			newComment._id = result.insertedId;
+			res.status(201).json({ message: 'Added comment', comment: newComment });
+		} catch (error) {
+			res.status(500).json({ message: 'Inserting data failed' });
+		}
 	}
 
 	if (req.method === 'GET') {
-		const documents = await db.collection('comments').find().sort({ _id: -1 }).toArray();
-		res.status(200).json({ comments: documents });
+		try {
+			client = await connectionDatabase();
+		} catch (error) {
+			res.status(500).json({ message: 'Connect to the Dababase failed' });
+			return;
+		}
+
+		try {
+			const documents = await getAllDocuments(client, 'comments', { _id: -1 });
+			res.status(200).json({ comments: documents });
+		} catch (error) {
+			res.status(500).json({ message: 'Load all data failed' });
+		}
 	}
 
 	client.close();
